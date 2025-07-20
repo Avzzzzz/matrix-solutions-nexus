@@ -1,13 +1,23 @@
 import { useState } from 'react';
-import { Filter, Search } from 'lucide-react';
+import { Filter, Search, Mail, MessageCircle, Send, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [chatStep, setChatStep] = useState(1);
+  const [userEmail, setUserEmail] = useState('');
+  const [userDetails, setUserDetails] = useState('');
+  const { toast } = useToast();
 
   const categories = [
     { id: 'all', name: 'All Products' },
@@ -99,6 +109,52 @@ const Products = () => {
                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  const handleContactForPricing = (product: any) => {
+    setSelectedProduct(product);
+    setIsContactModalOpen(true);
+    setChatStep(1);
+  };
+
+  const handleEmailSubmit = () => {
+    if (!userEmail) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address",
+        variant: "destructive",
+      });
+      return;
+    }
+    setChatStep(2);
+  };
+
+  const handleDetailsSubmit = () => {
+    if (!userDetails) {
+      toast({
+        title: "Details Required", 
+        description: "Please provide some details about your inquiry",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Simulate sending email
+    setTimeout(() => {
+      setChatStep(3);
+      toast({
+        title: "Inquiry Sent!",
+        description: "Your inquiry has been sent successfully. We'll respond soon!",
+      });
+    }, 1000);
+  };
+
+  const resetChat = () => {
+    setIsContactModalOpen(false);
+    setSelectedProduct(null);
+    setChatStep(1);
+    setUserEmail('');
+    setUserDetails('');
+  };
 
   return (
     <div className="min-h-screen pt-20">
@@ -195,9 +251,11 @@ const Products = () => {
                       <Button 
                         size="sm" 
                         variant="outline"
+                        onClick={() => handleContactForPricing(product)}
                         className="group-hover:bg-accent group-hover:text-accent-foreground transition-colors"
                       >
-                        Learn More
+                        <Mail className="h-4 w-4 mr-1" />
+                        Contact for Pricing
                       </Button>
                     </div>
                   </CardContent>
@@ -207,6 +265,142 @@ const Products = () => {
           )}
         </div>
       </section>
+
+      {/* Contact Modal with Chatbot */}
+      <Dialog open={isContactModalOpen} onOpenChange={resetChat}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5 text-accent" />
+              Product Inquiry
+            </DialogTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-4 top-4"
+              onClick={resetChat}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Chat Messages */}
+            <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+              {/* Bot Initial Message */}
+              <div className="flex items-start gap-2">
+                <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
+                  <MessageCircle className="h-4 w-4 text-accent-foreground" />
+                </div>
+                <div className="bg-background p-3 rounded-lg flex-1">
+                  <p className="text-sm">
+                    Hi! I understand you want to enquire about the price of <strong>{selectedProduct?.title}</strong>. 
+                    I'll help you get in touch with our team.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 1: Email Request */}
+              {chatStep >= 1 && (
+                <div className="flex items-start gap-2">
+                  <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
+                    <MessageCircle className="h-4 w-4 text-accent-foreground" />
+                  </div>
+                  <div className="bg-background p-3 rounded-lg flex-1">
+                    <p className="text-sm">Please provide your email address so we can respond to your inquiry:</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Details Request */}
+              {chatStep >= 2 && (
+                <>
+                  <div className="flex items-start gap-2 justify-end">
+                    <div className="bg-accent p-3 rounded-lg text-accent-foreground">
+                      <p className="text-sm">{userEmail}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
+                      <MessageCircle className="h-4 w-4 text-accent-foreground" />
+                    </div>
+                    <div className="bg-background p-3 rounded-lg flex-1">
+                      <p className="text-sm">Great! Please provide some details about your requirements or any specific questions you have:</p>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Step 3: Thank You */}
+              {chatStep >= 3 && (
+                <>
+                  <div className="flex items-start gap-2 justify-end">
+                    <div className="bg-accent p-3 rounded-lg text-accent-foreground max-w-[80%]">
+                      <p className="text-sm">{userDetails}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
+                      <MessageCircle className="h-4 w-4 text-accent-foreground" />
+                    </div>
+                    <div className="bg-background p-3 rounded-lg flex-1">
+                      <p className="text-sm font-medium text-accent">
+                        Thank you! We've received your inquiry about {selectedProduct?.title}. 
+                        Our team will respond as soon as possible to {userEmail}.
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Input Forms */}
+            {chatStep === 1 && (
+              <div className="space-y-3">
+                <Label htmlFor="email">Email Address</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your.email@example.com"
+                    value={userEmail}
+                    onChange={(e) => setUserEmail(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleEmailSubmit} size="sm">
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {chatStep === 2 && (
+              <div className="space-y-3">
+                <Label htmlFor="details">Your Requirements</Label>
+                <div className="space-y-2">
+                  <Textarea
+                    id="details"
+                    placeholder="Please describe your requirements, quantity needed, timeline, or any specific questions..."
+                    value={userDetails}
+                    onChange={(e) => setUserDetails(e.target.value)}
+                    rows={3}
+                  />
+                  <Button onClick={handleDetailsSubmit} className="w-full">
+                    <Send className="h-4 w-4 mr-2" />
+                    Send Inquiry
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {chatStep === 3 && (
+              <Button onClick={resetChat} className="w-full" variant="outline">
+                Close
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

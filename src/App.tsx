@@ -11,6 +11,10 @@ import Products from "./pages/Products";
 import Projects from "./pages/Projects";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import Designing from "./pages/services/Designing";
+import Manufacturing from "./pages/services/Manufacturing";
+import ElectricalElectronics from "./pages/services/ElectricalElectronics";
+import AIML from "./pages/services/AIML";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +28,10 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/services/designing" element={<Designing />} />
+          <Route path="/services/manufacturing" element={<Manufacturing />} />
+          <Route path="/services/electrical-electronics" element={<ElectricalElectronics />} />
+          <Route path="/services/ai-ml" element={<AIML />} />
           <Route path="/products" element={<Products />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/contact" element={<Contact />} />

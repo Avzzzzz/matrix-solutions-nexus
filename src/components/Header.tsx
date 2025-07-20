@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,10 +28,16 @@ const Header = () => {
   const navItems = [
     { name: 'Home', action: () => window.location.href = '/' },
     { name: 'About', action: () => scrollToSection('about') },
-    { name: 'Services', action: () => window.location.href = '/services' },
     { name: 'Products', action: () => window.location.href = '/products' },
     { name: 'Projects', action: () => window.location.href = '/projects' },
     { name: 'Contact', action: () => window.location.href = '/contact' },
+  ];
+
+  const serviceItems = [
+    { name: 'Designing', href: '/services/designing' },
+    { name: 'Manufacturing', href: '/services/manufacturing' },
+    { name: 'Electrical & Electronics', href: '/services/electrical-electronics' },
+    { name: 'AI/ML', href: '/services/ai-ml' },
   ];
 
   return (
@@ -51,6 +63,27 @@ const Header = () => {
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full"></span>
             </button>
           ))}
+          
+          {/* Services Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="text-foreground hover:text-accent transition-colors duration-200 font-medium relative group flex items-center space-x-1">
+              <span>Services</span>
+              <ChevronDown className="h-4 w-4" />
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full"></span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-card border border-border shadow-large">
+              {serviceItems.map((service) => (
+                <DropdownMenuItem key={service.name} asChild>
+                  <Link
+                    to={service.href}
+                    className="w-full px-3 py-2 text-foreground hover:text-accent hover:bg-accent-light/50 transition-colors duration-200"
+                  >
+                    {service.name}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Mobile Menu Button */}
@@ -77,6 +110,21 @@ const Header = () => {
                 {item.name}
               </button>
             ))}
+            
+            {/* Mobile Services Section */}
+            <div className="pt-2">
+              <div className="px-4 py-2 text-sm font-medium text-muted-foreground">Services</div>
+              {serviceItems.map((service) => (
+                <Link
+                  key={service.name}
+                  to={service.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block w-full text-left px-6 py-2 text-foreground hover:text-accent hover:bg-accent-light/50 rounded-lg transition-colors duration-200"
+                >
+                  {service.name}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       )}
