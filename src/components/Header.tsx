@@ -1,133 +1,167 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [isProductsOpen, setIsProductsOpen] = useState(false);
+  const servicesRef = useRef<HTMLDivElement>(null);
+  const productsRef = useRef<HTMLDivElement>(null);
+  const closeTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  const scrollToSection = (sectionId: string) => {
+  const handleAboutClick = () => {
     if (location.pathname === '/') {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+      const aboutSection = document.getElementById('about');
+      if (aboutSection) {
+        aboutSection.scrollIntoView({ behavior: 'smooth' });
       }
     } else {
-      window.location.href = `/#${sectionId}`;
+      navigate('/');
+      setTimeout(() => {
+        const aboutSection = document.getElementById('about');
+        if (aboutSection) {
+          aboutSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
     }
-    setIsMenuOpen(false);
   };
 
-  const navItems = [
-    { name: 'Home', action: () => window.location.href = '/' },
-    { name: 'About', action: () => scrollToSection('about') },
-    { name: 'Products', action: () => window.location.href = '/products' },
-    { name: 'Projects', action: () => window.location.href = '/projects' },
-    { name: 'Contact', action: () => window.location.href = '/contact' },
-  ];
+  const handleDropdownMouseEnter = (type: 'services' | 'products') => {
+    if (closeTimeout.current) clearTimeout(closeTimeout.current);
+    if (type === 'services') {
+      setIsServicesOpen(true);
+      setIsProductsOpen(false); // Close products when services opens
+    } else {
+      setIsProductsOpen(true);
+      setIsServicesOpen(false); // Close services when products opens
+    }
+  };
 
-  const serviceItems = [
-    { name: 'Designing', href: '/services/designing' },
-    { name: 'Manufacturing', href: '/services/manufacturing' },
-    { name: 'Electrical & Electronics', href: '/services/electrical-electronics' },
-    { name: 'AI/ML', href: '/services/ai-ml' },
-  ];
+  const handleDropdownMouseLeave = (type: 'services' | 'products') => {
+    closeTimeout.current = setTimeout(() => {
+      if (type === 'services') setIsServicesOpen(false);
+      else setIsProductsOpen(false);
+    }, 180);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        servicesRef.current &&
+        !servicesRef.current.contains(event.target as Node)
+      ) {
+        setIsServicesOpen(false);
+      }
+      if (
+        productsRef.current &&
+        !productsRef.current.contains(event.target as Node)
+      ) {
+        setIsProductsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (closeTimeout.current) clearTimeout(closeTimeout.current);
+    };
+  }, []);
+
+  const [strokeLength, setStrokeLength] = useState("");
+  const [isInteger, setIsInteger] = useState(true);
+
+  const handleStrokeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setStrokeLength(val);
+    // Disable submit if value is not an integer
+    setIsInteger(val === "" || /^\d+$/.test(val));
+  };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-b shadow-soft">
-      <nav className="container mx-auto px-4 lg:px-6 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2 group">
-          <div className="w-10 h-10 bg-gradient-accent rounded-lg flex items-center justify-center group-hover:shadow-glow transition-all duration-300">
-            <span className="text-accent-foreground font-bold text-lg">M</span>
-          </div>
-          <span className="text-xl font-bold text-primary">Matrix Solution</span>
-        </Link>
+    <header className="bg-white shadow-md fixed top-0 w-full z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16 items-center">
+          <Link to="/" className="flex items-center space-x-2">
+            <img src="/src/assets/logo1 (2).png" alt="Matrix Solutions Logo" className="h-10 w-auto" />
+            <span className="text-xl font-bold text-gray-800">MATRIX SOLUTION</span>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
-          {navItems.map((item) => (
-            <button
-              key={item.name}
-              onClick={item.action}
-              className="text-foreground hover:text-accent transition-colors duration-200 font-medium relative group"
+          <nav className="hidden md:flex space-x-6 items-center">
+            <Link to="/" className="text-gray-700 hover:text-blue-600">Home</Link>
+            <button onClick={handleAboutClick} className="text-gray-700 hover:text-blue-600">About</button>
+
+            {/* Services Dropdown */}
+            <div
+              className="relative"
+              ref={servicesRef}
+              onMouseEnter={() => handleDropdownMouseEnter('services')}
+              onMouseLeave={() => handleDropdownMouseLeave('services')}
             >
-              {item.name}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full"></span>
-            </button>
-          ))}
-          
-          {/* Services Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="text-foreground hover:text-accent transition-colors duration-200 font-medium relative group flex items-center space-x-1">
-              <span>Services</span>
-              <ChevronDown className="h-4 w-4" />
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full"></span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-card border border-border shadow-large">
-              {serviceItems.map((service) => (
-                <DropdownMenuItem key={service.name} asChild>
-                  <Link
-                    to={service.href}
-                    className="w-full px-3 py-2 text-foreground hover:text-accent hover:bg-accent-light/50 transition-colors duration-200"
-                  >
-                    {service.name}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </Button>
-      </nav>
-
-      {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-card border-t shadow-medium animate-slide-up">
-          <div className="container mx-auto px-4 py-4 space-y-2">
-            {navItems.map((item) => (
               <button
-                key={item.name}
-                onClick={item.action}
-                className="block w-full text-left px-4 py-3 text-foreground hover:text-accent hover:bg-accent-light/50 rounded-lg transition-colors duration-200"
+                onClick={() => navigate("/services")}
+                className="text-gray-700 hover:text-blue-600 focus:outline-none"
+                aria-haspopup="true"
+                aria-expanded={isServicesOpen}
               >
-                {item.name}
+                Services
               </button>
-            ))}
-            
-            {/* Mobile Services Section */}
-            <div className="pt-2">
-              <div className="px-4 py-2 text-sm font-medium text-muted-foreground">Services</div>
-              {serviceItems.map((service) => (
-                <Link
-                  key={service.name}
-                  to={service.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block w-full text-left px-6 py-2 text-foreground hover:text-accent hover:bg-accent-light/50 rounded-lg transition-colors duration-200"
+              {isServicesOpen && (
+                <div
+                  className="absolute bg-white shadow-md mt-2 rounded-md z-10 min-w-[180px] transition-opacity duration-200"
+                  style={{ opacity: isServicesOpen ? 1 : 0 }}
                 >
-                  {service.name}
-                </Link>
-              ))}
+                  <Link to="/services/designing" className="block px-4 py-2 hover:bg-gray-100">Designing</Link>
+                  <Link to="/services/manufacturing" className="block px-4 py-2 hover:bg-gray-100">Manufacturing</Link>
+                  <Link to="/services/electrical-electronics" className="block px-4 py-2 hover:bg-gray-100">Electrical & Electronics</Link>
+                  <Link to="/services/ai-ml" className="block px-4 py-2 hover:bg-gray-100">AI/ML</Link>
+                  <Link to="/services/development" className="block px-4 py-2 hover:bg-gray-100">Development</Link>
+                </div>
+              )}
             </div>
-          </div>
+
+            {/* Products Dropdown */}
+            <div
+              className="relative"
+              ref={productsRef}
+              onMouseEnter={() => handleDropdownMouseEnter('products')}
+              onMouseLeave={() => handleDropdownMouseLeave('products')}
+            >
+              <button
+                onClick={() => navigate("/products")}
+                className="text-gray-700 hover:text-blue-600 focus:outline-none"
+                aria-haspopup="true"
+                aria-expanded={isProductsOpen}
+              >
+                Products
+              </button>
+              {isProductsOpen && (
+                <div
+                  className="absolute bg-white shadow-md mt-2 rounded-md z-10 min-w-[200px] transition-opacity duration-200"
+                  style={{ opacity: isProductsOpen ? 1 : 0 }}
+                >
+                  <Link to="/products/linear-actuators" className="block px-4 py-2 hover:bg-gray-100">Electrical Actuators</Link>
+                  <Link to="/products/pneumatics" className="block px-4 py-2 hover:bg-gray-100">Pneumatics</Link>
+                  <Link to="/products/control-panels" className="block px-4 py-2 hover:bg-gray-100">Control Panels</Link>
+                  <Link to="/cnc-machines" className="block px-4 py-2 hover:bg-gray-100">Desktop CNC</Link>
+                  <Link to="/products/robotics-kits" className="block px-4 py-2 hover:bg-gray-100">Robotics Kits</Link>
+                  <a
+                    href="/products/plastic-enclosure"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                  >
+                    Plastic Enclosure
+                  </a>
+                  <Link to="/products/membrane-industry" className="block px-4 py-2 hover:bg-gray-100">Membrane Industry</Link>
+                </div>
+              )}
+            </div>
+
+            <Link to="/projects" className="text-gray-700 hover:text-blue-600">Projects</Link>
+            <Link to="/contact" className="text-gray-700 hover:text-blue-600">Contact</Link>
+          </nav>
         </div>
-      )}
+      </div>
     </header>
   );
 };

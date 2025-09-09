@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Add this import
 import { ChevronDown, ChevronRight, Code, Cpu, Lightbulb, Wrench } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import WhatsappChat from "@/components/WhatsappChat";
 
 const Services = () => {
   const [openSections, setOpenSections] = useState<string[]>(['designing']);
+  const navigate = useNavigate(); // Initialize navigate
 
   const toggleSection = (section: string) => {
     setOpenSections(prev => 
@@ -20,19 +23,12 @@ const Services = () => {
       icon: Lightbulb,
       title: 'Designing',
       description: 'Professional design services from concept to completion',
+      route: '/services/designing', // Add route
       subservices: [
-        {
-          title: '2D Modelling',
-          description: 'Precise 2D technical drawings and blueprints for manufacturing and documentation.'
-        },
-        {
-          title: '3D Modelling',
-          description: 'Advanced 3D modeling for visualization, prototyping, and manufacturing planning.'
-        },
-        {
-          title: 'Drafting',
-          description: 'Technical drafting services for engineering documentation and compliance.'
-        }
+        { title: '2D Modelling', description: 'Precise 2D technical drawings and blueprints for manufacturing and documentation.' },
+        { title: '3D Modelling', description: 'Advanced 3D modeling for visualization, prototyping, and manufacturing planning.' },
+        { title: 'Drafting', description: 'Technical drafting services for engineering documentation and compliance.' },
+        { title: 'Product Designing', description: 'We transform innovative ideas into user-centric, manufacturable products through expert design and prototyping.' }
       ]
     },
     {
@@ -40,75 +36,12 @@ const Services = () => {
       icon: Wrench,
       title: 'Manufacturing',
       description: 'Complete manufacturing solutions with advanced machinery and techniques',
+      route: '/services/manufacturing', // Add route
       subservices: [
-        {
-          title: 'Non-Conventional Manufacturing',
-          description: 'EDM, laser cutting, and other advanced non-conventional manufacturing processes.'
-        },
-        {
-          title: 'Turning',
-          description: 'Precision turning operations for cylindrical components and parts.'
-        },
-        {
-          title: 'Smelling',
-          description: 'Specialized smelling operations for metal processing and finishing.'
-        },
-        {
-          title: 'Grinding',
-          description: 'High-precision grinding for surface finishing and dimensional accuracy.'
-        },
-        {
-          title: 'Conventional Machining',
-          description: 'Traditional machining operations including milling, drilling, and boring.'
-        },
-        {
-          title: 'CNC Machining',
-          description: 'Computer-controlled machining for high precision and repeatability.'
-        },
-        {
-          title: 'VMC (Vertical Machining Center)',
-          description: 'Advanced vertical machining for complex geometries and tight tolerances.'
-        },
-        {
-          title: 'EDM (Electrical Discharge Machining)',
-          description: 'Precision electrical discharge machining for complex shapes and hard materials.'
-        },
-        {
-          title: 'Wiring Connector Manufacturing',
-          description: 'Custom connector manufacturing and electrical component production.'
-        },
-        {
-          title: 'Fabrication',
-          description: 'Structural fabrication and assembly services for various industries.'
-        },
-        {
-          title: 'Sheet Metal Work',
-          description: 'Precision sheet metal fabrication, forming, and finishing.'
-        },
-        {
-          title: 'Welding',
-          description: 'Professional welding services including TIG, MIG, and arc welding.'
-        },
-        {
-          title: 'Buffing',
-          description: 'Surface buffing and polishing for aesthetic and functional finishes.'
-        },
-        {
-          title: 'Sheet Metal Laser Cutting',
-          description: 'High-precision laser cutting for sheet metal components.'
-        },
-        {
-          title: 'Prototyping',
-          description: 'Rapid prototyping services for product development and testing.'
-        },
-        {
-          title: '3D Printing',
-          description: 'Additive manufacturing for rapid prototyping and custom parts.'
-        },
-        {
-          title: 'Acrylic Laser Cutting',
-          description: 'Precision laser cutting services for acrylic and plastic materials.'
-        }
+        { title: 'Non-Conventional Manufacturing', description: 'EDM, laser cutting, and other advanced non-conventional manufacturing processes.' },
+        { title: 'Conventional Machining', description: 'Traditional machining operations including milling, drilling, and boring.' },
+        { title: 'Fabrication', description: 'Structural fabrication and assembly services for various industries.' },
+        { title: 'Prototyping', description: 'Rapid prototyping services for product development and testing.' }
       ]
     },
     {
@@ -116,19 +49,11 @@ const Services = () => {
       icon: Cpu,
       title: 'Electrical/Electronics',
       description: 'Complete electrical and electronic solutions for industrial applications',
+      route: '/services/electrical-electronics', // Add route
       subservices: [
-        {
-          title: 'PLC Programming',
-          description: 'Industrial automation programming for PLCs and control systems.'
-        },
-        {
-          title: 'Electrical Panel Wiring',
-          description: 'Professional electrical panel design, wiring, and installation services.'
-        },
-        {
-          title: 'DIY Circuits',
-          description: 'Custom circuit design and development for specialized applications.'
-        }
+        { title: 'PLC Programming', description: 'Industrial automation programming for PLCs and control systems.' },
+        { title: 'Electrical Panel Wiring', description: 'Professional electrical panel design, wiring, and installation services.' },
+        { title: 'DIY Circuits', description: 'Custom circuit design and development for specialized applications.' }
       ]
     },
     {
@@ -136,21 +61,29 @@ const Services = () => {
       icon: Code,
       title: 'AI/ML',
       description: 'Cutting-edge artificial intelligence and machine learning solutions',
+      route: '/services/ai-ml', // Add route
       subservices: [
-        {
-          title: 'Computer Vision',
-          description: 'Advanced computer vision systems for quality control, inspection, and automation.'
-        },
-        {
-          title: 'Chatbots',
-          description: 'Intelligent chatbot development for customer service and business automation.'
-        }
+        { title: 'Computer Vision', description: 'Advanced computer vision systems for quality control, inspection, and automation.' },
+        { title: 'Chatbots', description: 'Intelligent chatbot development for customer service and business automation.' }
+      ]
+    },
+    {
+      id: 'development',
+      icon: Code,
+      title: 'Development',
+      description: 'Web, mobile, and embedded development solutions',
+      route: '/services/development', // Add route
+      subservices: [
+        { title: 'Web Development', description: 'Custom web applications and websites.' },
+        { title: 'Mobile Development', description: 'iOS and Android app development.' },
+        { title: 'Embedded Systems', description: 'Firmware and embedded software solutions.' }
       ]
     }
   ];
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-20 font-sans">
+      <WhatsappChat />
       {/* Header */}
       <section className="py-20 bg-gradient-hero text-primary-foreground">
         <div className="container mx-auto px-4 lg:px-6 text-center">
@@ -183,7 +116,17 @@ const Services = () => {
                             <service.icon className="h-8 w-8 text-accent" />
                           </div>
                           <div className="text-left">
-                            <CardTitle className="text-2xl mb-2">{service.title}</CardTitle>
+                            {/* Make the title clickable for navigation */}
+                            <button
+                              className="text-2xl mb-2 font-bold text-accent hover:underline focus:outline-none"
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent dropdown toggle
+                                navigate(service.route);
+                              }}
+                            >
+                              {service.title}
+                            </button>
                             <CardDescription className="text-base">
                               {service.description}
                             </CardDescription>
@@ -197,7 +140,6 @@ const Services = () => {
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
-                  
                   <CollapsibleContent>
                     <CardContent className="pt-0">
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

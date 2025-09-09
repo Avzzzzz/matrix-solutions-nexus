@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import emailjs from "emailjs-com";
 import { Mail, MapPin, MessageCircle, Phone, Send } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,13 +7,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import WhatsappChat from "@/components/WhatsappChat";
+
+const validateEmail = (email: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+const validatePhone = (phone: string) =>
+  /^\+?\d{10,15}$/.test(phone.replace(/\s/g, ""));
 
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    contactNumber: '',
     message: ''
   });
+  const [errors, setErrors] = useState<{ email?: string; contactNumber?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -22,22 +32,60 @@ const Contact = () => {
       ...prev,
       [name]: value
     }));
+    setErrors(prev => ({
+      ...prev,
+      [name]: undefined
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    let newErrors: { email?: string; contactNumber?: string } = {};
+
+    if (!validateEmail(formData.email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+    if (!validatePhone(formData.contactNumber)) {
+      newErrors.contactNumber = "Please enter a valid phone number (10-15 digits, with country code).";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      setIsSubmitting(false);
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Simulate form submission
-    setTimeout(() => {
+    // Updated EmailJS integration
+    emailjs.send(
+      "service_tqa1axe", // new service id
+      "template_03xph0x", // new template id
+      {
+        from_name: formData.name,
+        from_email: formData.email,
+        contact_number: formData.contactNumber,
+        message: formData.message,
+      },
+      "FGCgYRsuOVMCF72vb" // new public key
+    )
+    .then(() => {
       toast({
         title: "Message Sent Successfully!",
         description: "Thank you for contacting Matrix Solution. We'll get back to you soon.",
       });
-      
-      setFormData({ name: '', email: '', message: '' });
+      setFormData({ name: '', email: '', contactNumber: '', message: '' });
       setIsSubmitting(false);
-    }, 1000);
+    })
+    .catch((error) => {
+      toast({
+        title: "Failed to send message.",
+        description: error.text || "Please try again later or contact us directly.",
+        variant: "destructive"
+      });
+      setIsSubmitting(false);
+    });
   };
 
   const contactInfo = [
@@ -52,8 +100,8 @@ const Contact = () => {
       icon: MessageCircle,
       title: 'WhatsApp',
       description: 'Message us directly',
-      contact: '+1 (555) 123-4567',
-      action: 'https://wa.me/15551234567'
+      contact: '+91 9867214498',
+      action: 'https://wa.me/919867214498'
     },
     {
       icon: Phone,
@@ -73,6 +121,7 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen pt-20">
+      <WhatsappChat />
       {/* Header */}
       <section className="py-20 bg-gradient-hero text-primary-foreground">
         <div className="container mx-auto px-4 lg:px-6 text-center">
@@ -123,6 +172,26 @@ const Contact = () => {
                         required
                         className="transition-all duration-200 focus:shadow-medium"
                       />
+                      {errors.email && (
+                        <span className="text-red-500 text-sm">{errors.email}</span>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="contact-number">Contact Number</Label>
+                      <Input
+                        id="contact-number"
+                        name="contactNumber"
+                        type="tel"
+                        value={formData.contactNumber}
+                        onChange={handleInputChange}
+                        placeholder="+91 "
+                        required
+                        className="transition-all duration-200 focus:shadow-medium"
+                      />
+                      {errors.contactNumber && (
+                        <span className="text-red-500 text-sm">{errors.contactNumber}</span>
+                      )}
                     </div>
                     
                     <div className="space-y-2">

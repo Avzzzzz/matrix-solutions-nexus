@@ -2,18 +2,20 @@ import { ArrowRight, Calendar, Users, Wrench } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
+import WhatsappChat from "@/components/WhatsappChat";
 
 const Projects = () => {
+  const navigate = useNavigate();
+
   const projects = [
     {
       id: 1,
       title: 'Automated Quality Control System',
       category: 'R&D',
       description: 'AI-powered vision system for real-time quality control in manufacturing processes.',
-      image: '/api/placeholder/400/250',
       technologies: ['Computer Vision', 'PLC', 'AI/ML'],
       timeline: '6 months',
-      team: '4 engineers',
       status: 'completed'
     },
     {
@@ -21,10 +23,8 @@ const Projects = () => {
       title: 'Custom SPM for Automotive Parts',
       category: 'SPM',
       description: 'Special Purpose Machine designed for precision manufacturing of automotive components.',
-      image: '/api/placeholder/400/250',
       technologies: ['CNC', 'Automation', 'Control Systems'],
       timeline: '8 months',
-      team: '6 engineers',
       status: 'completed'
     },
     {
@@ -32,10 +32,8 @@ const Projects = () => {
       title: 'IoT-Enabled Smart Factory Solution',
       category: 'R&D',
       description: 'Complete IoT infrastructure for smart factory monitoring and predictive maintenance.',
-      image: '/api/placeholder/400/250',
       technologies: ['IoT', 'Cloud Computing', 'Data Analytics'],
       timeline: '12 months',
-      team: '8 engineers',
       status: 'ongoing'
     },
     {
@@ -43,10 +41,8 @@ const Projects = () => {
       title: 'Robotic Assembly Line',
       category: 'Prototype',
       description: 'Fully automated robotic assembly line for electronic component manufacturing.',
-      image: '/api/placeholder/400/250',
       technologies: ['Robotics', 'Vision Systems', 'PLCs'],
       timeline: '10 months',
-      team: '5 engineers',
       status: 'completed'
     },
     {
@@ -54,10 +50,8 @@ const Projects = () => {
       title: 'Advanced Material Testing Machine',
       category: 'Product Development',
       description: 'High-precision testing equipment for advanced material characterization.',
-      image: '/api/placeholder/400/250',
       technologies: ['Precision Engineering', 'Data Acquisition', 'Control Systems'],
       timeline: '9 months',
-      team: '7 engineers',
       status: 'completed'
     },
     {
@@ -65,10 +59,8 @@ const Projects = () => {
       title: 'AI Chatbot for Customer Service',
       category: 'R&D',
       description: 'Intelligent chatbot system with natural language processing capabilities.',
-      image: '/api/placeholder/400/250',
       technologies: ['NLP', 'Machine Learning', 'Cloud APIs'],
       timeline: '4 months',
-      team: '3 engineers',
       status: 'ongoing'
     }
   ];
@@ -89,8 +81,13 @@ const Projects = () => {
     }
   };
 
+  const handleViewDetails = (projectId: number) => {
+    navigate(`/projects/${projectId}`);
+  };
+
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-20 font-sans">
+      <WhatsappChat />
       {/* Header */}
       <section className="py-20 bg-gradient-hero text-primary-foreground">
         <div className="container mx-auto px-4 lg:px-6 text-center">
@@ -191,15 +188,12 @@ const Projects = () => {
                       <Calendar className="h-4 w-4" />
                       <span>{project.timeline}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Users className="h-4 w-4" />
-                      <span>{project.team}</span>
-                    </div>
                   </div>
                   
                   <Button 
                     variant="outline" 
                     className="w-full group-hover:bg-accent group-hover:text-accent-foreground transition-colors"
+                    onClick={() => handleViewDetails(project.id)}
                   >
                     View Details
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -216,7 +210,7 @@ const Projects = () => {
         <div className="container mx-auto px-4 lg:px-6 text-center">
           <h2 className="text-3xl font-bold text-primary mb-4">Have a Project in Mind?</h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Let's discuss how we can bring your ideas to life with our expertise and innovative solutions.
+           Let's discuss how we can bring your ideas to life with our expertise and innovative solutions.
           </p>
           <Button 
             size="lg" 
